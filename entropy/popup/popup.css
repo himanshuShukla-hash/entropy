@@ -71,6 +71,111 @@ body {
   margin-top: -6px;
 }
 
+/* --------------------------------------------------------
+   INTENSITY SLIDER
+   Maps 1 (Mild) → 2 (Medium) → 3 (Hardcore)
+   -------------------------------------------------------- */
+
+.slider-section {
+  background: #182234;
+  border: 1px solid #293548;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.slider-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.slider-value-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.slider-value-badge.mild {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+.slider-value-badge.medium {
+  background: #78350f;
+  color: #fde68a;
+}
+
+.slider-value-badge.hardcore {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+/* Native range input — custom track & thumb */
+.intensity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, #38bdf8 0%, #f59e0b 50%, #ef4444 100%);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.intensity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 2px solid #38bdf8;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.intensity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25);
+}
+
+.intensity-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 2px solid #38bdf8;
+  cursor: pointer;
+}
+
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.slider-ticks span {
+  font-size: 0.62rem;
+  color: #64748b;
+}
+
+/* --------------------------------------------------------
+   ACTION BUTTONS
+   -------------------------------------------------------- */
+
 .action-section {
   display: flex;
   flex-direction: column;
@@ -114,6 +219,10 @@ body {
   color: #ffffff;
 }
 
+/* --------------------------------------------------------
+   STAGE CHIP SELECTOR
+   -------------------------------------------------------- */
+
 .stage-selector {
   background: #182234;
   border: 1px solid #293548;
@@ -154,6 +263,10 @@ body {
   color: #f8fafc;
   border-color: #475569;
 }
+
+/* --------------------------------------------------------
+   FOOTER
+   -------------------------------------------------------- */
 
 .popup-footer {
   margin-top: 4px;

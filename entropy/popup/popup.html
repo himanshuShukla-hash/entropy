@@ -18,6 +18,29 @@
 
     <p class="subtitle">Progressive visual friction engine</p>
 
+    <!-- Intensity slider: maps 1=Mild, 2=Medium, 3=Hardcore -->
+    <div class="slider-section">
+      <div class="slider-header">
+        <span class="slider-label">Intensity</span>
+        <span id="slider-value-label" class="slider-value-badge mild">1 — Mild</span>
+      </div>
+      <input
+        type="range"
+        id="intensity-slider"
+        class="intensity-slider"
+        min="1"
+        max="3"
+        step="1"
+        value="1"
+        aria-label="Decay intensity: 1=Mild, 2=Medium, 3=Hardcore"
+      >
+      <div class="slider-ticks">
+        <span>Mild</span>
+        <span>Medium</span>
+        <span>Hardcore</span>
+      </div>
+    </div>
+
     <div class="action-section">
       <button id="btn-apply-decay" class="btn btn-decay">
         <span>🔥</span> Apply Decay
