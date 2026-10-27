@@ -4,13 +4,31 @@
    Guiding principle: Make staying less appealing without breaking core safety.
    ======================================================== */
 
+/* --------------------------------------------------------
+   KEYFRAME ANIMATIONS
+   -------------------------------------------------------- */
+
+/* Hover jitter — micro-shake on cards during active decay */
+@keyframes entropy-jitter {
+  0%, 100% { transform: translate(0, 0); }
+  25%       { transform: translate(-2px, 1px); }
+  50%       { transform: translate(2px, -1px); }
+  75%       { transform: translate(-1px, 2px); }
+}
+
+/* --------------------------------------------------------
+   STAGE 1 — WARNING (entropy-decay-active only)
+   Subtle changes that hint something is off.
+   -------------------------------------------------------- */
+
 /* Base transition for smooth friction application */
 body.entropy-decay-active {
   transition: filter 0.6s ease, background-color 0.6s ease !important;
   filter: grayscale(40%) contrast(95%);
+  cursor: crosshair !important;
 }
 
-/* 1. Subtle Spacing & Cramming (Warning Stage) */
+/* Subtle Spacing & Cramming */
 body.entropy-decay-active article,
 body.entropy-decay-active .post-card,
 body.entropy-decay-active [class*="card"],
@@ -25,7 +43,28 @@ body.entropy-decay-active span {
   letter-spacing: -0.4px !important;
 }
 
-/* 2. Transparency & Overlap (Decay Stage) */
+/* Desaturate link colors at Stage 1+ */
+body.entropy-decay-active a,
+body.entropy-decay-active a:visited {
+  color: #888 !important;
+  text-decoration: none !important;
+  transition: color 0.4s ease !important;
+}
+
+/* Hover jitter — cards shake when hovered during any active stage */
+body.entropy-decay-active article:hover,
+body.entropy-decay-active .post-card:hover,
+body.entropy-decay-active [class*="card"]:hover,
+body.entropy-decay-active [class*="tweet"]:hover,
+body.entropy-decay-active [class*="post"]:hover {
+  animation: entropy-jitter 0.15s infinite !important;
+}
+
+/* --------------------------------------------------------
+   STAGE 2 — DECAY
+   Transparency, overlap, progressive image blur, font rot.
+   -------------------------------------------------------- */
+
 body.entropy-decay-active.entropy-stage-2,
 body.entropy-stage-2 {
   filter: grayscale(80%) sepia(20%) contrast(90%) !important;
@@ -41,25 +80,204 @@ body.entropy-stage-2 .post-card {
   z-index: 1 !important;
 }
 
-/* 3. Chaos & Distortion (Chaos Stage) */
-body.entropy-decay-active.entropy-stage-3,
-body.entropy-stage-3 {
-  filter: grayscale(100%) contrast(120%) !important;
+/* Progressive image blur — Stage 2 (subtle, disorienting) */
+body.entropy-decay-active.entropy-stage-2 img,
+body.entropy-stage-2 img {
+  filter: blur(2px) !important;
+  transition: filter 0.5s ease !important;
 }
 
+/* Comic Sans font rot begins at Stage 2 */
+body.entropy-decay-active.entropy-stage-2 p,
+body.entropy-decay-active.entropy-stage-2 h1,
+body.entropy-decay-active.entropy-stage-2 h2,
+body.entropy-decay-active.entropy-stage-2 h3,
+body.entropy-decay-active.entropy-stage-2 span,
+body.entropy-stage-2 p,
+body.entropy-stage-2 h1,
+body.entropy-stage-2 h2,
+body.entropy-stage-2 h3,
+body.entropy-stage-2 span {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive !important;
+}
+
+/* --------------------------------------------------------
+   STAGE 3 — CHAOS
+   Full distortion: tilt, max blur, cursor panic, invert creep.
+   -------------------------------------------------------- */
+
+body.entropy-decay-active.entropy-stage-3,
+body.entropy-stage-3 {
+  filter: grayscale(100%) contrast(120%) invert(10%) !important;
+  cursor: wait !important;
+}
+
+/* Images — max blur + hue chaos */
 body.entropy-decay-active.entropy-stage-3 img,
 body.entropy-decay-active.entropy-stage-3 .avatar,
 body.entropy-stage-3 img,
 body.entropy-stage-3 .avatar {
   transform: scale(1.15) rotate(2deg) !important;
-  filter: contrast(150%) hue-rotate(90deg) !important;
+  filter: blur(6px) contrast(150%) hue-rotate(90deg) !important;
   transition: transform 0.5s ease !important;
 }
 
+/* Post cards — tilt and heavy overlap */
 body.entropy-decay-active.entropy-stage-3 article,
 body.entropy-decay-active.entropy-stage-3 .post-card,
 body.entropy-stage-3 article,
 body.entropy-stage-3 .post-card {
   margin-top: -40px !important;
   transform: rotate(-1deg) !important;
+}
+
+/* Paragraphs — tilt to add visual discomfort */
+body.entropy-decay-active.entropy-stage-3 p,
+body.entropy-stage-3 p {
+  transform: rotate(-2deg) !important;
+  display: block !important;
+}
+
+/* Full Comic Sans rot at Stage 3 (all text elements) */
+body.entropy-decay-active.entropy-stage-3 p,
+body.entropy-decay-active.entropy-stage-3 h1,
+body.entropy-decay-active.entropy-stage-3 h2,
+body.entropy-decay-active.entropy-stage-3 h3,
+body.entropy-decay-active.entropy-stage-3 h4,
+body.entropy-decay-active.entropy-stage-3 span,
+body.entropy-decay-active.entropy-stage-3 li,
+body.entropy-stage-3 p,
+body.entropy-stage-3 h1,
+body.entropy-stage-3 h2,
+body.entropy-stage-3 h3,
+body.entropy-stage-3 h4,
+body.entropy-stage-3 span,
+body.entropy-stage-3 li {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive !important;
+}
+
+/* ============================================================
+   SITE-SPECIFIC PRESETS
+   Targeted selectors for real social media DOM structures.
+   These layer on top of the generic stage rules above.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   TWITTER / X — data-testid selectors (verified via DevTools)
+   ---------------------------------------------------------- */
+
+/* Stage 1 — subtle tweet fade */
+body.entropy-decay-active [data-testid="tweet"],
+body.entropy-decay-active [data-testid="tweetText"] {
+  opacity: 0.85 !important;
+  transition: opacity 0.4s ease !important;
+}
+
+/* Stage 2 — gray out tweets and text */
+body.entropy-stage-2 [data-testid="tweet"],
+body.entropy-stage-2 [data-testid="tweetText"] {
+  opacity: 0.6 !important;
+  filter: grayscale(70%) !important;
+}
+
+/* Stage 2 — blur tweet images */
+body.entropy-stage-2 [data-testid="tweetPhoto"] img,
+body.entropy-stage-2 [data-testid="card.layoutSmall.media"] img {
+  filter: blur(3px) grayscale(60%) !important;
+}
+
+/* Stage 3 — near-invisible tweets with chaos tilt */
+body.entropy-stage-3 [data-testid="tweet"] {
+  opacity: 0.35 !important;
+  transform: rotate(-1.5deg) !important;
+  filter: grayscale(100%) sepia(40%) !important;
+}
+
+/* Stage 3 — Trending and sidebar widgets collapse */
+body.entropy-stage-3 [data-testid="sidebarColumn"],
+body.entropy-stage-3 [aria-label="Timeline: Trending now"] {
+  opacity: 0.2 !important;
+  pointer-events: none !important;
+}
+
+/* ----------------------------------------------------------
+   REDDIT — class-based selectors (verified via DevTools)
+   ---------------------------------------------------------- */
+
+/* Stage 1 — dimming post cards */
+body.entropy-decay-active shreddit-post,
+body.entropy-decay-active [data-testid="post-container"],
+body.entropy-decay-active .thing.link {
+  opacity: 0.8 !important;
+  transition: opacity 0.4s ease !important;
+}
+
+/* Stage 2 — post cards go semi-transparent, thumbnails blurred */
+body.entropy-stage-2 shreddit-post,
+body.entropy-stage-2 [data-testid="post-container"],
+body.entropy-stage-2 .thing.link {
+  opacity: 0.55 !important;
+  filter: grayscale(60%) !important;
+}
+
+body.entropy-stage-2 shreddit-post img,
+body.entropy-stage-2 [data-testid="post-container"] img,
+body.entropy-stage-2 .thing.link img {
+  filter: blur(3px) grayscale(50%) !important;
+}
+
+/* Stage 3 — feed becomes nearly unreadable */
+body.entropy-stage-3 shreddit-post,
+body.entropy-stage-3 [data-testid="post-container"],
+body.entropy-stage-3 .thing.link {
+  opacity: 0.3 !important;
+  transform: rotate(-1deg) !important;
+  filter: grayscale(100%) sepia(30%) !important;
+}
+
+/* Stage 3 — sidebar and trending topics collapse */
+body.entropy-stage-3 [data-testid="subreddit-sidebar"],
+body.entropy-stage-3 .side {
+  opacity: 0.15 !important;
+  pointer-events: none !important;
+}
+
+/* ----------------------------------------------------------
+   YOUTUBE SHORTS — element selectors (verified via DevTools)
+   ---------------------------------------------------------- */
+
+/* Stage 1 — subtle Shorts feed dimming */
+body.entropy-decay-active ytd-reel-video-renderer,
+body.entropy-decay-active ytd-short-video-renderer {
+  opacity: 0.8 !important;
+  transition: opacity 0.5s ease !important;
+}
+
+/* Stage 2 — blur Shorts thumbnails and overlay */
+body.entropy-stage-2 ytd-reel-video-renderer,
+body.entropy-stage-2 ytd-short-video-renderer {
+  opacity: 0.55 !important;
+  filter: grayscale(65%) !important;
+}
+
+body.entropy-stage-2 ytd-reel-video-renderer img,
+body.entropy-stage-2 ytd-short-video-renderer img,
+body.entropy-stage-2 #shorts-container img {
+  filter: blur(4px) grayscale(60%) !important;
+}
+
+/* Stage 3 — Shorts player nearly invisible */
+body.entropy-stage-3 ytd-reel-video-renderer,
+body.entropy-stage-3 ytd-short-video-renderer,
+body.entropy-stage-3 #shorts-container {
+  opacity: 0.25 !important;
+  filter: grayscale(100%) sepia(50%) !important;
+  transform: rotate(-1deg) !important;
+}
+
+/* Stage 3 — Recommendation sidebar chaos */
+body.entropy-stage-3 ytd-watch-next-secondary-results-renderer {
+  opacity: 0.2 !important;
+  filter: grayscale(100%) blur(3px) !important;
+  pointer-events: none !important;
 }
