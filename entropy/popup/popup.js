@@ -1,24 +1,60 @@
 /**
  * ENTROPY — POPUP CONTROLLER (popup/popup.js)
- * 
+ *
  * Demonstrates Chrome Manifest V3 APIs:
  * - chrome.tabs.query: Finds the currently active browser tab
  * - chrome.scripting.insertCSS: Injects extension-owned CSS rules into the page
  * - chrome.scripting.removeCSS: Safely removes extension CSS rules
  * - chrome.scripting.executeScript: Runs reversible DOM class manipulation
+ *
+ * New in this version:
+ * - Intensity slider: maps 1 (Mild) → 2 (Medium) → 3 (Hardcore)
+ *   "Apply Decay" reads the slider so you pick intensity before firing.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const btnApplyDecay = document.getElementById('btn-apply-decay');
-  const btnReset = document.getElementById('btn-reset');
-  const btnStage1 = document.getElementById('btn-stage-1');
-  const btnStage2 = document.getElementById('btn-stage-2');
-  const btnStage3 = document.getElementById('btn-stage-3');
-  const popupStatus = document.getElementById('popup-status');
-  const statusMessage = document.getElementById('status-message');
+  const btnApplyDecay    = document.getElementById('btn-apply-decay');
+  const btnReset         = document.getElementById('btn-reset');
+  const btnStage1        = document.getElementById('btn-stage-1');
+  const btnStage2        = document.getElementById('btn-stage-2');
+  const btnStage3        = document.getElementById('btn-stage-3');
+  const popupStatus      = document.getElementById('popup-status');
+  const statusMessage    = document.getElementById('status-message');
+  const intensitySlider  = document.getElementById('intensity-slider');
+  const sliderValueLabel = document.getElementById('slider-value-label');
+
+  /** Human-readable labels for each slider position */
+  const STAGE_LABELS = {
+    1: '1 — Mild',
+    2: '2 — Medium',
+    3: '3 — Hardcore'
+  };
+
+  /** CSS class names for the badge colour by intensity */
+  const STAGE_BADGE_CLASS = {
+    1: 'mild',
+    2: 'medium',
+    3: 'hardcore'
+  };
 
   /**
-   * Helper: Get the currently active tab in the focused window
+   * Sync the badge label + colour whenever the slider moves.
+   * This is pure UI — no tab interaction.
+   */
+  function updateSliderUI(value) {
+    const stage = parseInt(value, 10);
+    sliderValueLabel.textContent = STAGE_LABELS[stage];
+    sliderValueLabel.className   = `slider-value-badge ${STAGE_BADGE_CLASS[stage]}`;
+  }
+
+  // Wire the live preview on drag
+  intensitySlider.addEventListener('input', (e) => updateSliderUI(e.target.value));
+
+  // Initialise label on load
+  updateSliderUI(intensitySlider.value);
+
+  /**
+   * Helper: Get the currently active tab in the focused window.
    */
   async function getActiveTab() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -26,14 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Check if a tab URL is supported (cannot inject scripts into chrome:// or chrome-extension://)
+   * Check if a tab URL is supported.
+   * Cannot inject scripts into chrome:// or chrome-extension:// pages.
    */
   function isRestrictedUrl(url) {
-    return !url || url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('edge://');
+    return (
+      !url ||
+      url.startsWith('chrome://') ||
+      url.startsWith('chrome-extension://') ||
+      url.startsWith('edge://')
+    );
   }
 
   /**
-   * Applies decay CSS and classes to the active page
+   * Applies decay CSS and classes to the active page.
+   * @param {number} stage - 1 (Mild), 2 (Medium), or 3 (Hardcore)
    */
   async function applyDecay(stage = 1) {
     try {
@@ -54,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         files: ['content/decay.css']
       });
 
-      // Step 2: Add decay classes to <body>
+      // Step 2: Add decay classes to <body> — only classList, never innerHTML
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (selectedStage) => {
@@ -66,9 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // Update popup UI
+      const label = STAGE_LABELS[stage] || `Stage ${stage}`;
       popupStatus.textContent = `Stage ${stage}`;
       popupStatus.className = 'status-pill decayed';
-      statusMessage.textContent = `Decay Stage ${stage} applied to tab.`;
+      statusMessage.textContent = `Decay applied — ${label}.`;
     } catch (err) {
       console.error(err);
       statusMessage.textContent = `Error: ${err.message}`;
@@ -76,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Completely removes decay effects and restores original page appearance
+   * Completely removes decay effects and restores original page appearance.
+   * Guaranteed to be clean — removes every class Entropy may have set.
    */
   async function resetPage() {
     try {
@@ -125,7 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Check initial page decay state when popup opens
+   * Check initial page decay state when popup opens.
+   * Reflects reality in case a service worker already applied decay.
    */
   async function checkInitialStatus() {
     try {
@@ -152,12 +198,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Bind Event Listeners
-  btnApplyDecay.addEventListener('click', () => applyDecay(1));
+  // ── Event Listeners ──────────────────────────────────────────────────────────
+
+  // "Apply Decay" reads the current slider value
+  btnApplyDecay.addEventListener('click', () => {
+    const stage = parseInt(intensitySlider.value, 10);
+    applyDecay(stage);
+  });
+
   btnReset.addEventListener('click', resetPage);
-  btnStage1.addEventListener('click', () => applyDecay(1));
-  btnStage2.addEventListener('click', () => applyDecay(2));
-  btnStage3.addEventListener('click', () => applyDecay(3));
+
+  // Stage chip buttons also sync the slider to match
+  btnStage1.addEventListener('click', () => {
+    intensitySlider.value = '1';
+    updateSliderUI('1');
+    applyDecay(1);
+  });
+  btnStage2.addEventListener('click', () => {
+    intensitySlider.value = '2';
+    updateSliderUI('2');
+    applyDecay(2);
+  });
+  btnStage3.addEventListener('click', () => {
+    intensitySlider.value = '3';
+    updateSliderUI('3');
+    applyDecay(3);
+  });
 
   // Initialize
   checkInitialStatus();
